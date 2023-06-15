@@ -31,41 +31,9 @@ public class Main {
             }
         }).start();
 
-        new Thread(() -> {
-            for (int i = 0; i < ROUTE; i++) {
-                try {
-                    String rout = listA.take();
-                    counter(rout, 'a', maxA);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-            System.out.format("Самое большое количество символов 'a' в строке: %d \n", maxA.get());
-        }).start();
-
-        new Thread(() -> {
-            for (int i = 0; i < ROUTE; i++) {
-                try {
-                    String rout = listB.take();
-                    counter(rout, 'b', maxB);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-            System.out.format("Самое большое количество символов 'b' в строке: %d \n", maxB.get());
-        }).start();
-
-        new Thread(() -> {
-            for (int i = 0; i < ROUTE; i++) {
-                try {
-                    String text = listC.take();
-                    counter(text, 'c', maxC);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-            System.out.format("Самое большое количиство символов 'c' в строке: %d \n", maxC.get());
-        }).start();
+        threadStart(listA, 'a', maxA);
+        threadStart(listB, 'b', maxB);
+        threadStart(listC, 'c', maxC);
 
 
     }
@@ -85,5 +53,19 @@ public class Main {
             text.append(letters.charAt(random.nextInt(letters.length())));
         }
         return text.toString();
+    }
+
+    public static void threadStart(ArrayBlockingQueue<String> arrayBlockingQueue, char symb, AtomicInteger atomicInteger) {
+        new Thread(() -> {
+            for (int i = 0; i < ROUTE; i++) {
+                try {
+                    String rout = arrayBlockingQueue.take();
+                    counter(rout, symb, atomicInteger);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            System.out.format("Самое большое количество символов '%c' в строке: %d \n", symb, atomicInteger.get());
+        }).start();
     }
 }
